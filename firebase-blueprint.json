@@ -1,0 +1,179 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user information and roles.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "name": { "type": "string", "description": "Full name of the user" },
+        "email": { "type": "string", "format": "email", "description": "TCET email address" },
+        "role": { "type": "string", "enum": ["student", "teacher", "hod", "admin"], "description": "User role" },
+        "erpId": { "type": "string", "description": "ERP ID for login" },
+        "department": { "type": "string", "description": "Department name" },
+        "academicYear": { "type": "string" },
+        "semester": { "type": "string" },
+        "division": { "type": "string" },
+        "profileComplete": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "role", "erpId"]
+    },
+    "AcademicResource": {
+      "title": "Academic Resource",
+      "description": "Files like QB, PYQ, Textbooks, and other resources.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subject": { "type": "string" },
+        "url": { "type": "string", "format": "uri" },
+        "fileName": { "type": "string" },
+        "fileType": { "type": "string" },
+        "uploadedBy": { "type": "string" },
+        "teacherName": { "type": "string" },
+        "category": { "type": "string", "enum": ["qb", "pyq", "library", "resources"] },
+        "department": { "type": "string" },
+        "classId": { "type": "string" },
+        "year": { "type": "string" },
+        "semester": { "type": "string" },
+        "division": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "denied"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "approvedAt": { "type": "string", "format": "date-time" },
+        "approvedBy": { "type": "string" }
+      }
+    },
+    "ProfileRequest": {
+      "title": "Profile Change Request",
+      "description": "Request from student to change academic details.",
+      "type": "object",
+      "properties": {
+        "studentId": { "type": "string" },
+        "studentName": { "type": "string" },
+        "erpId": { "type": "string" },
+        "currentDetails": { "type": "object" },
+        "requestedDetails": { "type": "object" },
+        "status": { "type": "string", "enum": ["pending", "approved", "denied"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Question": {
+      "title": "Single Question",
+      "description": "Individual question added manually.",
+      "type": "object",
+      "properties": {
+        "subject": { "type": "string" },
+        "topic": { "type": "string" },
+        "difficulty": { "type": "string" },
+        "question": { "type": "string" },
+        "answer": { "type": "string" },
+        "department": { "type": "string" },
+        "year": { "type": "string" },
+        "uploadedBy": { "type": "string" },
+        "teacherName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Attendance": {
+      "title": "Attendance Record",
+      "description": "Daily attendance for a specific class section.",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date" },
+        "teacherId": { "type": "string" },
+        "teacherName": { "type": "string" },
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "studentId": { "type": "string" },
+              "studentName": { "type": "string" },
+              "erpId": { "type": "string" },
+              "present": { "type": "boolean" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Quiz": {
+      "title": "Quiz",
+      "description": "Quiz definition for a class.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "subject": { "type": "string" },
+        "semester": { "type": "string" },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": { "type": "string" },
+              "options": { "type": "array", "items": { "type": "string" } },
+              "correctAnswer": { "type": "number" }
+            }
+          }
+        },
+        "teacherId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "QuizScore": {
+      "title": "Quiz Score",
+      "description": "Student score for a specific quiz.",
+      "type": "object",
+      "properties": {
+        "quizId": { "type": "string" },
+        "quizTitle": { "type": "string" },
+        "studentId": { "type": "string" },
+        "studentName": { "type": "string" },
+        "erpId": { "type": "string" },
+        "score": { "type": "number" },
+        "total": { "type": "number" },
+        "submittedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{erpId}": {
+      "schema": "UserProfile",
+      "description": "User profile documents keyed by ERP ID."
+    },
+    "/users_by_uid/{uid}": {
+      "schema": {
+        "type": "object",
+        "properties": {
+          "role": { "type": "string" },
+          "erpId": { "type": "string" }
+        }
+      },
+      "description": "Mapping of UID to ERP ID and role for security rules."
+    },
+    "/academic_resources/{resourceId}": {
+      "schema": "AcademicResource",
+      "description": "Academic resources (QB, PYQ, etc.)."
+    },
+    "/profile_requests/{requestId}": {
+      "schema": "ProfileRequest",
+      "description": "Student profile change requests."
+    },
+    "/question_banks/{questionId}": {
+      "schema": "Question",
+      "description": "Individual questions repository."
+    },
+    "/departments/{deptId}/classes/{classId}/attendance/{date}": {
+      "schema": "Attendance",
+      "description": "Attendance records."
+    },
+    "/departments/{deptId}/classes/{classId}/quizzes/{quizId}": {
+      "schema": "Quiz",
+      "description": "Quiz definitions."
+    },
+    "/departments/{deptId}/classes/{classId}/quizzes/{quizId}/scores/{studentId}": {
+      "schema": "QuizScore",
+      "description": "Student quiz scores."
+    }
+  }
+}
